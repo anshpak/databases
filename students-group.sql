@@ -122,7 +122,7 @@ select * from students_info;
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
 
 update students_info
-set monthly_scholarship = monthly_scholarship * 1.2 where char_length(student_last_name) - char_length(replace(
+set monthly_scholarship = monthly_scholarship * 1.2 where char_length(replace(
 replace(
 	replace(
 		replace(
@@ -130,7 +130,7 @@ replace(
 				replace(
 					replace(
 						replace(
-							replace(lower(student_last_name), 'ю', ''), 'и', ''), 'я', ''), 'э', ''), 'о', ''), 'ы', ''), 'е', ''), 'у', ''), 'а', '')) < char_length(replace(
+							replace(lower(student_last_name), 'ю', ''), 'и', ''), 'я', ''), 'э', ''), 'о', ''), 'ы', ''), 'е', ''), 'у', ''), 'а', '')) < char_length(student_last_name) - char_length(replace(
 replace(
 	replace(
 		replace(
@@ -146,5 +146,9 @@ select * from students_info;
 -- 1.3.1. Увеличьте также стипендию на столько процентов каждому студенту, сколько дней осталось до конца текущего года. 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
 
+update students_info
+set monthly_scholarship = (100 + datediff('2023-12-31', curdate())) * monthly_scholarship / 100;
+
+select monthly_scholarship from students_info;
 
 
