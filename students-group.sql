@@ -202,12 +202,45 @@ from students_info where student_sex = 'female';
 
 select * from students_sex_female_info;
 
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+-- 1.6 Добавьте к имени студента приставку в зависимости от места рождения. Например, «Саша» -> «Саша.Бобруйск». Важно! Названия городов хранятся в
+-- другой таблице. Используйте оператор обновления с соединением таблиц.
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
+-- Так как у меня уже есть столбец с городами, отделю его в новую таблицу. После чего уже объединю значение имени и города из двух таблиц.
+-- Создаю новую таблицу с городами.
 
+drop table if exists students_home_cities;
+create table students_home_cities
+(
+	city_id tinyint unsigned primary key auto_increment,
+    city_name varchar(15),
+    constraint cn1 foreign key (city_id) references students_info(student_id)
+);
 
+insert into students_home_cities
+(city_name)
+select student_home_city from students_info;
 
+select * from students_home_cities;
 
+-- Удаляю ненужный столбец с городами из старой таблицы.
 
+alter table students_info
+drop column student_home_city;
+
+-- Переименую старый столбец.
+
+alter table students_info
+change student_first_name student_nickname varchar(20);
+
+-- Создаю никнейм для таблицы students_info.
+
+update students_info
+join students_home_cities on city_id = student_id
+set student_nickname = concat(student_nickname, '.', city_name);
+
+select * from students_info;
 
 
 
