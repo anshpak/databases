@@ -121,6 +121,8 @@ select * from students_info;
 -- 1.3. Реализуйте скрипт для увеличения стипендии на 20% тем студентам, у которых в фамилии больше гласных букв, чем согласных.
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
 
+-- char_length возвращает число символов в строке, в отличие от length, которая символы считает по байтам.
+
 update students_info
 set monthly_scholarship = monthly_scholarship * 1.2 where char_length(replace(
 replace(
@@ -150,5 +152,63 @@ update students_info
 set monthly_scholarship = (100 + datediff('2023-12-31', curdate())) * monthly_scholarship / 100;
 
 select monthly_scholarship from students_info;
+
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+-- 1.4. Реализуйте последовательность команд для разделения мальчиков и девочек на 2 разных таблицы.
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
+
+drop table if exists students_sex_male_info;
+create table students_sex_male_info(
+	student_id tinyint unsigned primary key auto_increment,
+	student_first_name varchar(15),
+    student_last_name varchar(15),
+    student_subgroup set('a', 'b'),
+    grade_point_average float(4, 2) unsigned,
+    has_student_debths bool,
+    monthly_scholarship decimal(6, 2),
+    tution_fee decimal(7, 2) default 0,
+    participation set('Student Council', 'Student Council of Quality of Education', 'Council of Elders', 'BRYU', 'Council of Dormitries') default '',
+    student_birth_date date,
+    student_home_city varchar(15)
+);
+
+insert into students_sex_male_info
+(student_first_name, student_last_name, student_subgroup, grade_point_average, has_student_debths, monthly_scholarship, tution_fee, participation, student_birth_date, student_home_city)
+select student_first_name, student_last_name, student_subgroup, grade_point_average, has_student_debths, monthly_scholarship, tution_fee, participation, student_birth_date, student_home_city
+from students_info where student_sex = 'male';
+
+select * from students_sex_male_info;
+
+drop table if exists students_sex_female_info;
+create table students_sex_female_info
+(
+	student_id tinyint unsigned primary key auto_increment,
+	student_first_name varchar(15),
+    student_last_name varchar(15),
+    student_subgroup set('a', 'b'),
+    grade_point_average float(4, 2) unsigned,
+    has_student_debths bool,
+    monthly_scholarship decimal(6, 2),
+    tution_fee decimal(7, 2) default 0,
+    participation set('Student Council', 'Student Council of Quality of Education', 'Council of Elders', 'BRYU', 'Council of Dormitries') default '',
+    student_birth_date date,
+    student_home_city varchar(15)
+);
+
+insert into students_sex_female_info
+(student_first_name, student_last_name, student_subgroup, grade_point_average, has_student_debths, monthly_scholarship, tution_fee, participation, student_birth_date, student_home_city)
+select student_first_name, student_last_name, student_subgroup, grade_point_average, has_student_debths, monthly_scholarship, tution_fee, participation, student_birth_date, student_home_city
+from students_info where student_sex = 'female';
+
+select * from students_sex_female_info;
+
+
+
+
+
+
+
+
+
 
 
