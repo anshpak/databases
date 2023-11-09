@@ -1,43 +1,31 @@
+drop database if exists pub;
 create database pub;
 use pub;
 
 drop table if exists staff;
 create table staff(
-	employee_id varchar(10) primary key default(concat(char(round(rand()*25)+97), char(round(rand()*25)+97),
-char(round(rand()*25)+97), char(round(rand()*25)+97),
-char(round(rand()*25)+97), char(round(rand()*25)+97),
-char(round(rand()*25)+97), char(round(rand()*25)+97),
-char(round(rand()*25)+97), char(round(rand()*25)+97))),
+	employee_id int primary key auto_increment,
     employee_name varchar(50) not null,
     employee_surname varchar(50) not null,
     employee_position enum('barman', 'cook'),
-    employee_birth_date date
+    employee_birth_date date,
+    employee_nickname text default (concat(employee_position, employee_name, employee_surname, employee_birth_date, now())),
+    employee_age int default (date_format(from_days(datediff(now(), employee_birth_date)), '%Y') + 0)
 );
 
-alter table staff add column employee_age int(11);
-alter table staff add column employee_nickname varchar(100);
-
-create trigger insert_trigger
-before insert on staff
-for each row
-set new.employee_nickname = concat(new.employee_position, new.employee_name, new.employee_surname, uuid()),
-new.employee_age = date_format(from_days(datediff(now(), new.employee_birth_date)), '%Y') + 0;
-
-create trigger update_trigger
-before update on staff
-for each row
-set new.employee_nickname = concat(new.employee_position, new.employee_name, new.employee_surname, uuid());
-
+drop table if exists contracts;
 create table contracts (
 	contract_start_date date default (CURRENT_DATE()),
     contract_end_date date,
     salary int(11) not null default '0',
-    contract_id int(11) auto_increment,
+    contract_id int auto_increment,
     primary key (contract_id),
     constraint cn1 foreign key (contract_id) references staff(employee_id),
     constraint cont_start_end_const check (contract_start_date <> contract_end_date),
     constraint salary_max_cons check (salary < 10000)
 );
+
+drop table if exists sells;
 create table sells (
 	sell_id int(11) primary key,
     sell_date datetime not null,
@@ -45,12 +33,16 @@ create table sells (
     sell_amount float not null,
     constraint cn2 foreign key (barman_id) references staff(employee_id)
 );
+
+drop table if exists products;
 create table product (
 	product_id int(11) primary key auto_increment,
     product_name varchar(50) not null,
     product_type varchar(30) not null,
     product_price float not null
 );
+
+drop table if exists product_sells;
 create table product_sells (
 	sell_id int(11) not null,
     product_id int(11) not null,
