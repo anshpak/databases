@@ -41,43 +41,90 @@ create table customer_info(
     purchase_date varchar(30)
 );
 
-drop table if exists product_info;
-create table product_info(
-	product_id tinyint unsigned primary key auto_increment,
-    author_id tinyint unsigned,
+#-----------------------------------------------------------------------------------
+
+# Поработаю с книгами и авторами. Добавлю еще одну таболицу, которая будет связывать id книги и id ее автора / авторов.
+
+drop table if exists book_info;
+create table book_info(
+	book_id tinyint unsigned primary key auto_increment,
     title_name varchar(50),
     isbn varchar(10)
 );
 
-drop table if exists authors;
-create table authors(
+drop table if exists author_info;
+create table author_info(
 	author_id tinyint unsigned primary key auto_increment,
-    title_id tinyint unsigned default 0,
     author_name varchar(30)
 );
 
+#-----------------------------------------------------------------------------------
+
 # Для начала заполню таблицу с авторами.
 
-insert into authors
+insert into author_info
 (author_name) 
 select first_author_name from check_info;
 
-insert into authors
+insert into author_info
 (author_name) 
 select second_author_name from check_info;
 
-select * from authors;
+select * from author_info;
 
 set sql_safe_updates = 0;
 
-delete from authors
+# Приведу записи в порядок.
+
+delete from author_info
 where author_id in (4, 9, 11);
 
-insert into authors
+insert into author_info
 (author_name)
-select substring(substring_index(author_name, '&', -1), 2, char_length(substring_index(author_name, '&', -1))) from authors where author_id = 12;
+select substring(substring_index(author_name, '&', -1), 2, char_length(substring_index(author_name, '&', -1))) from author_info where author_id = 12;
 
-update authors
+update author_info
 set author_name = substring(substring_index(author_name, '&', 1), 1, char_length(substring_index(author_name, '&', 1)) - 1) where author_id = 12;
 
-select * from authors;
+select * from author_info;
+
+#-----------------------------------------------------------------------------------
+
+# Заполню таблицу с книгами.
+
+insert into book_info
+(title_name, isbn)
+select title_name, isbn from check_info;
+
+select * from book_info;
+
+# Удалю ненужную дублирующуяся запись.
+
+delete from book_info
+where book_id = 4;
+
+#-----------------------------------------------------------------------------------
+
+# Добавлю таблицу для связи авторов и книг.
+
+drop table if exists books_and_authors;
+create table books_and_authors(
+	book_id tinyint unsigned,
+    author_id tinyint unsigned,
+    constraint cn1 foreign key (book_id) references book_info(book_id),
+    constraint cn2 foreign key (author_id) references author_info(author_id)
+);
+
+insert into books_and_authors
+(book_id, author_id)
+values
+(1, 1),
+(1, 8),
+(2, 2),
+(3, 3),
+(3, 10),
+(5, 5),
+(5, 12),
+(5, 15);
+
+select * from books_and_authors;
