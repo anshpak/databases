@@ -39,17 +39,35 @@ delete from guides where guide_id in (2, 4);
 
 select * from guides;
 
+drop table if exists courses;
+create table courses(
+	course_name varchar(20),
+    primary key (course_name)
+);
+
+insert into courses
+(course_name)
+select guide_name from guides limit 3;
+
+select * from courses;
+
 drop table if exists courses_and_guides;
 create table courses_and_guides(
 	course_name varchar(20),
-    guide_name varchar(20),
-    primary key (course_name, guide_name)
+    guide_id tinyint unsigned,
+    primary key(course_name, guide_id),
+    constraint cn1 foreign key (course_name) references courses(course_name),
+    constraint cn2 foreign key (guide_id) references guides(guide_id)
 );
-
 insert into courses_and_guides
-(course_name, guide_name)
-select course_name, guide_name from courses_info;
-
+(course_name, guide_id)
+values
+('Информатика', 1),
+('Информатика', 3),
+('Сети ЭВМ', 1),
+('Сети ЭВМ', 3),
+('Программирование', 5),
+('Программирование', 6);
 
 select * from courses_and_guides;
 
@@ -58,7 +76,7 @@ create table students_and_courses(
 	student_name varchar(1),
     course_name varchar(20),
     primary key (student_name, course_name),
-    constraint cn1 foreign key (course_name) references courses_and_guides(course_name)
+    constraint cn3 foreign key (course_name) references courses(course_name)
 );
 
 insert into students_and_courses
