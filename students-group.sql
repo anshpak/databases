@@ -242,6 +242,11 @@ set student_nickname = concat(student_nickname, '.', city_name);
 
 select * from students_info;
 
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+-- 1.5.1. Реализуйте оператор обновления, который изменяет некоторую дату на ближайший четверг чётного числа.
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
+update students_info
+set student_birth_date = date_add(curdate(), interval 4 - weekday(curdate()) day);
 
-
+select * from students_info;
