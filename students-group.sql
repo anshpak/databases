@@ -247,6 +247,20 @@ select * from students_info;
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
 update students_info
-set student_birth_date = date_add(curdate(), interval 4 - weekday(curdate()) day);
+set student_birth_date = if(dayofmonth(date_add(curdate(), interval 4 - weekday(curdate()) day)) % 2 = 0, date_add(curdate(), interval 4 - weekday(curdate()) day), 
+if(4 - weekday(curdate()) > 0, date_add(curdate(), interval -7 + 4 - weekday(curdate()) day), date_add(curdate(), interval 7 + 4 - weekday(curdate()) day)));
 
 select * from students_info;
+
+
+
+
+
+
+
+
+
+
+
+
+
