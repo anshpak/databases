@@ -27,15 +27,12 @@ select * from courses_info;
 
 drop table if exists guides;
 create table guides(
-	guide_id tinyint unsigned primary key auto_increment,
-    guide_name varchar(20)
+    guide_name varchar(20) primary key
 );
 
-insert into guides
+insert ignore into guides
 (guide_name)
 select guide_name from courses_info;
-
-delete from guides where guide_id in (2, 4);
 
 select * from guides;
 
@@ -45,7 +42,7 @@ create table courses(
     primary key (course_name)
 );
 
-insert into courses
+insert ignore into courses
 (course_name)
 select guide_name from guides limit 3;
 
@@ -54,20 +51,15 @@ select * from courses;
 drop table if exists courses_and_guides;
 create table courses_and_guides(
 	course_name varchar(20),
-    guide_id tinyint unsigned,
-    primary key(course_name, guide_id),
+    guide_name varchar(20),
+    primary key(course_name, guide_name),
     constraint cn1 foreign key (course_name) references courses(course_name),
-    constraint cn2 foreign key (guide_id) references guides(guide_id)
+    constraint cn2 foreign key (guide_name) references guides(guide_name)
 );
+
 insert into courses_and_guides
-(course_name, guide_id)
-values
-('Информатика', 1),
-('Информатика', 3),
-('Сети ЭВМ', 1),
-('Сети ЭВМ', 3),
-('Программирование', 5),
-('Программирование', 6);
+(course_name, guide_name)
+select course_name, guide_name from courses_info;
 
 select * from courses_and_guides;
 
@@ -79,12 +71,8 @@ create table students_and_courses(
     constraint cn3 foreign key (course_name) references courses(course_name)
 );
 
-insert into students_and_courses
+insert ignore into students_and_courses
 (student_name, course_name)
-select student_name, course_name from courses_info limit 2;
-
-insert into students_and_courses
-(student_name, course_name)
-select student_name, course_name from courses_info where guide_name = 'Теория Алгоритмов';
+select student_name, course_name from courses_info;
 
 select * from students_and_courses;

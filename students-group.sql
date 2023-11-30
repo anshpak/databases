@@ -28,7 +28,7 @@ values
 ('Арина', 'Волкова', 'a', 9.3, 0, 1400, 'female', 'Council of Elders', '2005-05-21', false, 'Lida'),
 ('Артур', 'Кожевников', 'b', 7.7, 180, default, 'male', 'Student Council of Quality of Education,Council of Dormitries,BRYU', '2004-07-31', false, 'Slonim'),
 ('Игорь', 'Морохов', 'a', 8.4, 220, default, 'male', default, '2004-10-16', false, 'Dzerzinsk');
--- select * from students_info;
+select * from students_info;
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 -- 1.1. Измените тип, название, порядок следования 3–ёх произвольных столбцов. Обратите внимание на приведение типов в MySQL.
@@ -107,7 +107,7 @@ modify has_student_debths bool;
 select * from students_info;
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
--- 1.2. . Добавьте столбец со средним баллом студента и размером стипендии и размером оплаты за учёбу (если таковых не было). Пусть необходимо увеличить все
+-- 1.2. Добавьте столбец со средним баллом студента и размером стипендии и размером оплаты за учёбу (если таковых не было). Пусть необходимо увеличить все
 -- стипендии на 10% и поднять плату за обучение на 15%. Реализуйте необходимый скрипт для обновления данных.
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
 
@@ -247,20 +247,10 @@ select * from students_info;
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
 update students_info
+set student_birth_date = '2003-01-03';
+
+update students_info
 set student_birth_date = if(dayofmonth(date_add(curdate(), interval 4 - weekday(curdate()) day)) % 2 = 0, date_add(curdate(), interval 4 - weekday(curdate()) day), 
 if(4 - weekday(curdate()) > 0, date_add(curdate(), interval -7 + 4 - weekday(curdate()) day), date_add(curdate(), interval 7 + 4 - weekday(curdate()) day)));
 
 select * from students_info;
-
-
-
-
-
-
-
-
-
-
-
-
-
