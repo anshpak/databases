@@ -35,11 +35,11 @@ create table sells (
 );
 
 drop table if exists products;
-create table product (
+create table products (
 	product_id int(11) primary key auto_increment,
     product_name varchar(50) not null,
     product_type varchar(30) not null,
-    product_price float not null
+    product_price decimal not null
 );
 
 drop table if exists product_sells;
@@ -48,10 +48,10 @@ create table product_sells (
     product_id int(11) not null,
     primary key (sell_id, product_id),
     constraint cn3 foreign key (sell_id) references sells(sell_id),
-    constraint cn4 foreign key (product_id) references product(product_id)
+    constraint cn4 foreign key (product_id) references products(product_id)
 );
 show tables;
-insert into product
+insert into products
 (product_name, product_type, product_price) 
 values
 ('"Bonaqua"', 'Вода', '1.5'),
@@ -69,7 +69,7 @@ values
 ('Куриные крылья BBQ', 'Закуска', 8.50),
 ('"Российский"', 'Сыр', 5.25),
 ('"Шардоне"', 'Вино', 15.75);
-select * from product;
+select * from products;
 
 insert into staff
 (employee_name, employee_surname, employee_position, employee_birth_date) 
@@ -77,7 +77,7 @@ values
 ('Ульяна', 'Васильева', 'barman', '2000-12-11'),
 ('Максим', 'Рыбаков', 'cook', '1997-06-27'),
 ('Арина', 'Авдеева', 'cook', '2001-09-10'),
-('Пантелеев', 'Матвей', 'barman', '1995-02-01'),
+('Матвей', 'Пантелеев', 'barman', '1995-02-01'),
 ('Кожевников', 'Александр', 'cook', '1998-07-18'),
 ('Иван', 'Иванов', 'cook', '1990-05-15'),
 ('Петр', 'Петров', 'barman', '1985-08-20'),
@@ -98,7 +98,12 @@ values
 (1, '2023-09-17 00:40:34', 1, 4),
 (12, '2023-09-17 01:08:46', 1, 2),
 (111, '2023-09-17 02:25:13', 1, 7),
-(13, '2023-09-17 03:45:04', 4, 3);
+(13, '2023-09-17 03:45:04', 4, 3),
+(7, '2023-09-17 03:32:11', 9, 8),
+(2, '2023-09-17 02:06:34', 1, 3),
+(14, '2023-09-17 01:12:46', 4, 8),
+(435, '2023-09-17 05:43:13', 9, 11),
+(17, '2023-09-17 04:15:04', 4, 15);
 select * from sells;
 
 insert into product_sells
@@ -108,7 +113,13 @@ values
 (1, 5),
 (12, 1),
 (111, 4),
-(13, 3);
+(13, 3),
+(7, 1),
+(2, 2),
+(14, 8),
+(435, 6),
+(17, 15);
+
 select * from product_sells;
 
 insert into contracts
