@@ -93,7 +93,6 @@ select * from books;
 
 drop table if exists books_and_authors;
 create table books_and_authors(
-	book_id tinyint unsigned,
     author_id tinyint unsigned,
     author_name varchar(30),
     title_name varchar(50),

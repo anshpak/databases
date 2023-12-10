@@ -132,7 +132,7 @@ inner join
 ) as cities_amount_table
 on country.Name = cities_amount_table.country
 where cities_amount_table.amount >= 5
-order by country.Name, city.Population desc;
+order by country.Name desc;
 
 # Сортированные по населению города, у стран которых не менее 5 городов.
 
@@ -308,6 +308,88 @@ group by sorted_countries_and_cities_table.Code;
 # Объединю все вместе.
 
 select res_1_table.country, res_2_table.cities
+from
+(
+	select country_and_unoff_langs_population_table.country
+	from
+	(
+		select country.Name as country, unoff_lang_perc * country.Population / 100 as unnoficial_lang_speakers_amount
+		from country
+		inner join
+		(
+			select country.Name as country, sum(countrylanguage.Percentage) as unoff_lang_perc
+			from country
+			inner join countrylanguage
+			on countrylanguage.countryCode = country.Code where countrylanguage.IsOfficial = 'F'
+			group by country.Name	
+		) as country_and_unoff_lang_persentage_table
+		on country.Name = country_and_unoff_lang_persentage_table.country
+	) as country_and_unoff_langs_population_table
+	inner join
+	(
+		select sorted_countries_and_cities_table.Code, sorted_countries_and_cities_table.Name, sum(sorted_countries_and_cities_table.Population) / 5 as mean_population_in_five_big_cities from
+		(
+			select countries_and_cities_but_five_and_more_table.Code, countries_and_cities_but_five_and_more_table.Name, row_number() over (partition by countries_and_cities_but_five_and_more_table.Code order by city.Name) as row_num, city.Population
+			from city
+			inner join
+			(
+				select country.Code, country.Name, cities_amount_table.amount
+				from country
+				inner join
+				(
+					select country.Name as country, count(city.Name) as amount
+					from country
+					inner join city
+					on country.Code = city.CountryCode
+					group by country.Name
+				) as cities_amount_table
+				on country.Name = cities_amount_table.country
+				where cities_amount_table.amount >= 5
+			) as countries_and_cities_but_five_and_more_table
+			on city.CountryCode = countries_and_cities_but_five_and_more_table.Code
+			order by countries_and_cities_but_five_and_more_table.Name, city.Population desc
+		) as sorted_countries_and_cities_table
+		where row_num <= 5
+		group by sorted_countries_and_cities_table.Code
+	) as sorted_countries_and_cities_mean_table
+	on sorted_countries_and_cities_mean_table.Name = country_and_unoff_langs_population_table.country
+	where country_and_unoff_langs_population_table.unnoficial_lang_speakers_amount > sorted_countries_and_cities_mean_table.mean_population_in_five_big_cities
+) as res_1_table
+inner join
+(
+	select sorted_countries_and_cities_table.Code, sorted_countries_and_cities_table.Name, group_concat(sorted_countries_and_cities_table.city_name SEPARATOR ', ') AS cities from
+	(
+		select countries_and_cities_but_five_and_more_table.Code, countries_and_cities_but_five_and_more_table.Name, row_number() over (partition by countries_and_cities_but_five_and_more_table.Code order by city.Name) as row_num, city.Name as city_name, city.Population
+		from city
+		inner join
+		(
+			select country.Code, country.Name, cities_amount_table.amount
+			from country
+			inner join
+			(
+				select country.Name as country, count(city.Name) as amount
+				from country
+				inner join city
+				on country.Code = city.CountryCode
+				group by country.Name
+			) as cities_amount_table
+			on country.Name = cities_amount_table.country
+			where cities_amount_table.amount >= 5
+		) as countries_and_cities_but_five_and_more_table
+		on city.CountryCode = countries_and_cities_but_five_and_more_table.Code
+		order by countries_and_cities_but_five_and_more_table.Name, city.Population desc
+	) as sorted_countries_and_cities_table
+	where row_num <= 5
+	group by sorted_countries_and_cities_table.Code
+) as res_2_table
+on res_1_table.country = res_2_table.Name;
+
+# Добавлю запись в файл.
+
+select res_1_table.country, res_2_table.cities
+into outfile 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/res.txt'
+fields terminated by ': '
+lines terminated by '.\n'
 from
 (
 	select country_and_unoff_langs_population_table.country

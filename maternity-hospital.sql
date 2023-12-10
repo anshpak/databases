@@ -41,8 +41,9 @@ select * from parents;
 
 drop table if exists children;
 create table children(
+	child_id tinyint unsigned primary key auto_increment,
     child_name varchar(50),
-    child_birthday date primary key
+    child_birthday date
 );
 
 insert into children
@@ -71,10 +72,11 @@ select * from children;
 drop table if exists parent_and_child;
 create table parent_and_child(
 	parent_id int unsigned,
+    child_id tinyint unsigned default 1,
     child_birthday date,
-    primary key(parent_id, child_birthday),
+    primary key(parent_id, child_id, child_birthday),
     constraint cn1 foreign key (parent_id) references parents(parent_id),
-    constraint cn2 foreign key (child_birthday) references children(child_birthday)
+    constraint cn2 foreign key (child_id) references children(child_id)
 );
 
 insert into parent_and_child
@@ -95,5 +97,13 @@ insert into parent_and_child
 (parent_id, child_birthday)
 select distinct emp_id, str_to_date(substring_index(substring_index(child_birthday, ', ', -2), ', ', 1), '%m/%d/%y') from hospital
 where length(child_name) - length(replace(child_name, ',', '')) + 1 = 4;
+
+update parent_and_child
+join children
+on parent_and_child.child_birthday = children.child_birthday
+set parent_and_child.child_id = children.child_id;
+
+alter table parent_and_child
+drop column child_birthday;
 
 select * from parent_and_child;
