@@ -16,7 +16,7 @@ inner join products
 on product_sells.product_id = products.product_id;
 
 #-----------------------------------------------------------------------------------
-# 3.б 5 запросов на группировку.
+# 3.b 5 запросов на группировку.
 #-----------------------------------------------------------------------------------
 
 # Сколько продаж за все время сделали люди с фамилией, заканчивающейся на 'ова' или 'ов'.
@@ -30,10 +30,80 @@ inner join
 on sells.barman_id = ova_ov_surnames_table.employee_id
 group by sells.barman_id;
 
+# Вывести сотрудников с зарплатой выше среднего.
 
+select staff.employee_name, staff.employee_surname
+from staff
+inner join
+(
+	select contract_id
+	from contracts
+	where salary >
+	(
+		select avg(salary) from contracts as average_salary
+	)
+) salaries_above_average_table
+on staff.employee_id = salaries_above_average_table.contract_id;
+
+# Вывести сотрудника с минимальным возрастом, причем этот сотрудник продавал воду.
+
+select *
+from
+(
+	select min(staff.employee_age) as min_age
+	from staff
+	inner join
+	(
+		select distinct sells.barman_id
+		from sells
+		inner join
+		(
+			select product_sells.sell_id
+			from product_sells
+			inner join products
+			on product_sells.product_id = products.product_id where products.product_type = 'Вода'
+		) as vater_table
+		on vater_table.sell_id = sells.sell_id
+	) as vater_traders_ids
+	on staff.employee_id = vater_traders_ids.barman_id
+) as res1
+inner join 
+(
+	select staff.employee_name, staff.employee_surname, staff.employee_age
+    from staff
+    inner join
+    (
+		select distinct sells.barman_id
+		from sells
+		inner join
+		(
+			select product_sells.sell_id
+			from product_sells
+			inner join products
+			on product_sells.product_id = products.product_id where products.product_type = 'Вода'
+		) as vater_table
+		on vater_table.sell_id = sells.sell_id
+    ) as vater_traders_ids_table
+    on staff.employee_id = vater_traders_ids_table.barman_id
+) as res2
+on res1.min_age = res2.employee_age;
+
+# Самый старший сотрудник.
+
+select staff.employee_name, staff.employee_surname
+from staff
+inner join
+(
+	select max(staff.employee_age) as max_age from staff
+) as old
+on staff.employee_age = old.max_age;
+
+# Сколько лет Корзюку.
+
+select sum(employee_age) from staff;
 
 #-----------------------------------------------------------------------------------
-# 3.в 3 вложенных запроса.
+# 3.d 3 вложенных запроса.
 #-----------------------------------------------------------------------------------
 
 # На какую сумму продали товаров каждый из барменов, работавший 2023-09-17.
@@ -108,10 +178,20 @@ inner join
 ) as barmans_who_made_one_and_more_sells_amount_table
 on staff.employee_id <= barmans_who_made_one_and_more_sells_amount_table.barmans_who_made_one_and_more_sells;
 
+#-----------------------------------------------------------------------------------
+# 3.e Запрос с использованием операций над множествами.
+#-----------------------------------------------------------------------------------
 
+# Сотрудники, которые ваще ничего не делали.
 
+select employee_id, employee_name, employee_surname from staff
+where employee_id not in (
+    select barman_id from sells
+);
 
-
+#-----------------------------------------------------------------------------------
+# 3.f Обновление таблиц с использованием оператора соединения.
+#-----------------------------------------------------------------------------------
 
 
 
