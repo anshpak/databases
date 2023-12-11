@@ -90,11 +90,23 @@ inner join
 ) as salaries_table
 on salaries_table.contract_id = staff.employee_id;
 
+# Вывести столько сотрудников, сколько людей в штате родились после 1995 года и сделали хотя бы одну продажу.
 
-
-
-
-
+select staff.employee_name, staff.employee_surname
+from staff
+inner join
+(
+	select count(distinct sells.barman_id) as barmans_who_made_one_and_more_sells
+	from sells
+	inner join
+	(
+		select employee_id
+		from staff
+		where employee_birth_date > '1995-01-01'
+	) as were_born_after_1995_table
+	on were_born_after_1995_table.employee_id = sells.barman_id
+) as barmans_who_made_one_and_more_sells_amount_table
+on staff.employee_id <= barmans_who_made_one_and_more_sells_amount_table.barmans_who_made_one_and_more_sells;
 
 
 
