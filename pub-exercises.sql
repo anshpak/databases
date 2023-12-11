@@ -204,7 +204,9 @@ set staff.employee_name = 'Andrey';
 # 3.g Запрос с использованием оконных функций.
 #-----------------------------------------------------------------------------------
 
-
+select staff.employee_id, staff.employee_name, staff.employee_surname, staff.employee_position,
+row_number() over (partition by staff.employee_position order by staff.employee_id) as row_num
+from staff;
 
 #-----------------------------------------------------------------------------------
 # 4. Создайте представления для различных участников проекта из ЛР1.
