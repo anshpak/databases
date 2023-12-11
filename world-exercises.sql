@@ -439,7 +439,7 @@ from
 ) as res_1_table
 inner join
 (
-	select sorted_countries_and_cities_table.Code, sorted_countries_and_cities_table.Name, group_concat(sorted_countries_and_cities_table.city_name SEPARATOR ', ') AS cities from
+	select sorted_countries_and_cities_table.Code, sorted_countries_and_cities_table.Name, group_concat(sorted_countries_and_cities_table.city_name separator ', ') as cities from
 	(
 		select countries_and_cities_but_five_and_more_table.Code, countries_and_cities_but_five_and_more_table.Name, row_number() over (partition by countries_and_cities_but_five_and_more_table.Code order by city.Name) as row_num, city.Name as city_name, city.Population
 		from city

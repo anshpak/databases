@@ -193,5 +193,41 @@ where employee_id not in (
 # 3.f Обновление таблиц с использованием оператора соединения.
 #-----------------------------------------------------------------------------------
 
+set sql_safe_updates = 0;
+
+update staff
+join sells on
+sells.barman_id = staff.employee_id
+set staff.employee_name = 'Andrey';
+
+#-----------------------------------------------------------------------------------
+# 3.g Запрос с использованием оконных функций.
+#-----------------------------------------------------------------------------------
+
+
+
+#-----------------------------------------------------------------------------------
+# 4. Создайте представления для различных участников проекта из ЛР1.
+#-----------------------------------------------------------------------------------
+
+select info_table.employee_id, info_table.employee_name, info_table.employee_surname, info_table.employee_position, 
+info_table.sells, contracts.salary from 
+(
+	select staff.employee_id, staff.employee_name, staff.employee_surname, staff.employee_position, barmans_and_sells.sells
+	from staff
+	left join
+	(
+		select staff.employee_id, staff.employee_name, staff.employee_surname, staff.employee_position, count(sells.sell_amount) as sells
+		from staff
+		inner join sells
+		on staff.employee_id = sells.barman_id
+		group by staff.employee_id
+	) as barmans_and_sells
+	on staff.employee_id = barmans_and_sells.employee_id
+) as info_table
+inner join contracts
+on contracts.contract_id = info_table.employee_id;
+
+
 
 
