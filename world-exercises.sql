@@ -66,7 +66,8 @@ where count.cities_amount > 3;
 
 # Основное задание.
 
-select city.Name, count.cities_amount, country.Population / count.cities_amount as avg_pop, city.Population as capital_pop
+(
+select country.Code, country.Population / count.cities_amount as avg_pop, city.Population as capital_pop
 from city
 inner join country
 on city.ID = country.Capital
@@ -79,24 +80,15 @@ inner join
     group by country_name
 ) as count
 on country.Name = count.country_name
-where country.Population / count.cities_amount <= ifnull(city.Population, 0);
-
-select * from country where population = 0;
-
-select city.countryCode, ifnull(city.Name, "No city here"), ifnull(city.Population, 0)
-from city
-right join
+where country.Population / count.cities_amount <= ifnull(city.Population, 0)
+)
+union
 (
-	select * from country
-) as res
-on res.Code = city.countryCode
-order by ifnull(city.Population, 0);
-
-select country.Name as country_name, count(ifnull(city.Name, 0)) as cities_amount
-from country
-inner join city
-on country.Code = city.countryCode
-group by country_name;
+select country.Code, ifnull(city.name, 0), ifnull(city.Population, 0)
+from city
+right join country
+on country.Code = city.countryCode where country.Population = 0
+);
 
 #-----------------------------------------------------------------------------------
 # 2.4 Найдите количество городов в каждом регионе Азии.
